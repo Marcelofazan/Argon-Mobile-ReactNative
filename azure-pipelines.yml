@@ -23,12 +23,15 @@ steps:
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
     displayName: 'Instalar dependências (npm install)'
 
-  # 2.2 Gerar pasta nativa /android isoladamente
+  # 2.2 Gerar pasta nativa /android isoladamente (Injetando pacote via jq)
   - script: |
       export CI=true
+      echo "=== Injetando a configuração do pacote Android no app.json ==="
+      # O utilitário jq reescreve o app.json adicionando o pacote necessário
+      jq '.expo.android.package = "com.argon.app"' app.json > tmp.json && mv tmp.json app.json
+      
       echo "=== Executando o Expo Prebuild em modo CI ==="
-      # Passamos o argumento oficial --package para suprir a falta do app.json
-      npx expo prebuild --platform android --package "com.argon.app"
+      npx expo prebuild --platform android
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
     displayName: 'Pré-configurar Android (Expo Prebuild)'
     
