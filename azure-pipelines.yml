@@ -26,8 +26,8 @@ steps:
   # 2.2 Gerar pasta nativa /android isoladamente
   - script: |
       export CI=true
-      echo "=== Executando o Expo Prebuild sem interação ==="
-      npx expo prebuild --platform android --no-interactive
+      echo "=== Executando o Expo Prebuild em modo CI ==="
+      npx expo prebuild --platform android
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
     displayName: 'Pré-configurar Android (Expo Prebuild)'
     
