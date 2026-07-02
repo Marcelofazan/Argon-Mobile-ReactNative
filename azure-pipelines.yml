@@ -1,0 +1,43 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'macOS-latest' # Permite builds Android e iOS
+
+variables:
+  node_version: '18.x'
+  projectFolder: 'argon-react-native'
+
+steps:
+  # 1. Instalar Node.js
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '$(node_version)'
+    displayName: 'Instalar Node.js'
+
+  # 2. Instalar dependências ignorando conflitos de peer
+  - script: |
+      cd $(projectFolder)
+      npm install --legacy-peer-deps
+    displayName: 'Instalar dependências (Legacy Peer Deps)'
+
+  # 3. Criar e rodar testes com npx jest
+  - script: |
+      cd $(projectFolder)
+      npx jest --passWithNoTests
+    displayName: 'Executar testes (npx)'
+
+  # 4. Compilar a aplicação para APK (Debug ou Release)
+  - script: |
+      cd $(projectFolder)/android
+      chmod +x gradlew
+      ./gradlew assembleRelease
+    displayName: 'Compilar APK (Release)'
+
+  # 5. Publicar o arquivo APK gerado como artefato
+  - task: PublishBuildArtifacts@2
+    inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/$(projectFolder)/android/app/build/outputs/apk/release/'
+      artifactName: 'android-apk-release'
+      publishLocation: 'Container'
+    displayName: 'Publicar Artefato APK'
