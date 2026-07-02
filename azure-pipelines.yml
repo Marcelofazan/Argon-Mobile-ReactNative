@@ -6,7 +6,6 @@ pool:
 
 variables:
   node_version: '18.x'
-  # IMPORTANTE: Verifique se as maiúsculas/minúsculas deste nome batem exatamente com o Git
   projectFolder: 'argon-react-native' 
 
 steps:
@@ -16,17 +15,20 @@ steps:
       versionSpec: '$(node_version)'
     displayName: 'Instalar Node.js'
 
-  # 2. Instalar dependências (Usando workingDirectory nativo)
-  - script: npm install --legacy-peer-deps
+  # 2. Instalar dependências e Gerar a pasta Android do Expo
+  - script: |
+      npm install --legacy-peer-deps
+      # Adicione esta linha para gerar dinamicamente a pasta /android que o Git não possui
+      npx expo prebuild --platform android
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
-    displayName: 'Instalar dependências (Legacy Peer Deps)'
+    displayName: 'Instalar dependências e Pré-configurar Android (Expo)'
 
   # 3. Executar testes com npx
   - script: npx jest --passWithNoTests
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
     displayName: 'Executar testes (npx)'
 
-  # 4. Compilar APK (Apontando diretamente para a pasta interna /android)
+  # 4. Compilar APK (Agora a pasta /android existirá graças ao prebuild)
   - script: |
       chmod +x gradlew
       ./gradlew assembleRelease
