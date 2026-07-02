@@ -9,13 +9,13 @@ variables:
   projectFolder: 'argon-react-native' 
 
 steps:
-  # 1. Instalar Node.js
-  - task: NodeTool@0
+  # 1. Instalar Node.js usando a tarefa moderna recomendada pela Microsoft
+  - task: UseNode@1
     inputs:
-      versionSpec: '$(node_version)'
+      version: '$(node_version)'
     displayName: 'Instalar Node.js'
 
- # 2. Instalar dependências e Gerar a pasta Android do Expo (Otimizado)
+  # 2. Instalar dependências e Gerar a pasta Android do Expo (Otimizado por você)
   - script: |
       export CI=true
       echo "=== Iniciando instalação com tratamento de concorrência ==="
