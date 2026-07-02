@@ -15,17 +15,22 @@ steps:
       version: '$(node_version)'
     displayName: 'Instalar Node.js'
 
-  # 2. Instalar dependências e Gerar a pasta Android do Expo (Otimizado por você)
+  # 2.1 Instalar dependências (Com log ativo para evitar travamento por timeout)
   - script: |
       export CI=true
-      echo "=== Iniciando instalação com tratamento de concorrência ==="
-      npm install --legacy-peer-deps --no-audit --no-fund
-      
-      echo "=== Gerando código nativo com Expo Prebuild ==="
+      echo "=== Forçando instalação limpa e monitorada ==="
+      npm install --legacy-peer-deps --no-audit --no-fund --loglevel info --prefer-offline
+    workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
+    displayName: 'Instalar dependências (npm install)'
+
+  # 2.2 Gerar pasta nativa /android isoladamente
+  - script: |
+      export CI=true
+      echo "=== Executando o Expo Prebuild sem interação ==="
       npx expo prebuild --platform android --no-interactive
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
-    displayName: 'Instalar dependências e Pré-configurar Android (Expo)'
-
+    displayName: 'Pré-configurar Android (Expo Prebuild)'
+    
   # 3. Executar testes com npx
   - script: npx jest --passWithNoTests
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
