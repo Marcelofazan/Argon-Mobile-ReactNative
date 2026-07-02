@@ -27,7 +27,8 @@ steps:
   - script: |
       export CI=true
       echo "=== Executando o Expo Prebuild em modo CI ==="
-      npx expo prebuild --platform android
+      # Passamos o argumento oficial --package para suprir a falta do app.json
+      npx expo prebuild --platform android --package "com.argon.app"
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
     displayName: 'Pré-configurar Android (Expo Prebuild)'
     
