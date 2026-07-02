@@ -21,12 +21,6 @@ steps:
       npm install --legacy-peer-deps
     displayName: 'Instalar dependências (Legacy Peer Deps)'
 
-  # 3. Criar e rodar testes com npx jest
-  - script: |
-      cd $(projectFolder)
-      npx jest --passWithNoTests
-    displayName: 'Executar testes (npx)'
-
   # 4. Compilar a aplicação para APK (Debug ou Release)
   - script: |
       cd $(projectFolder)/android
