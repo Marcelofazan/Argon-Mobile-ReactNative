@@ -15,11 +15,14 @@ steps:
       versionSpec: '$(node_version)'
     displayName: 'Instalar Node.js'
 
-  # 2. Instalar dependências e Gerar a pasta Android do Expo
+ # 2. Instalar dependências e Gerar a pasta Android do Expo (Otimizado)
   - script: |
-      npm install --legacy-peer-deps
-      # Adicione esta linha para gerar dinamicamente a pasta /android que o Git não possui
-      npx expo prebuild --platform android
+      export CI=true
+      echo "=== Iniciando instalação com tratamento de concorrência ==="
+      npm install --legacy-peer-deps --no-audit --no-fund
+      
+      echo "=== Gerando código nativo com Expo Prebuild ==="
+      npx expo prebuild --platform android --no-interactive
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
     displayName: 'Instalar dependências e Pré-configurar Android (Expo)'
 
