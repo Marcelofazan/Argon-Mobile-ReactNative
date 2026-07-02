@@ -21,6 +21,12 @@ steps:
       npm install --legacy-peer-deps
     displayName: 'Instalar dependências (Legacy Peer Deps)'
 
+  # 3. Criar e rodar testes com npx jest
+  - script: |
+      cd $(projectFolder)
+      npx jest --passWithNoTests
+    displayName: 'Executar testes (npx)'
+    
   # 4. Compilar a aplicação para APK (Debug ou Release)
   - script: |
       cd $(projectFolder)/android
@@ -29,7 +35,7 @@ steps:
     displayName: 'Compilar APK (Release)'
 
   # 5. Publicar o arquivo APK gerado como artefato
-  - task: PublishBuildArtifacts@2
+  - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: '$(System.DefaultWorkingDirectory)/$(projectFolder)/android/app/build/outputs/apk/release/'
       artifactName: 'android-apk-release'
