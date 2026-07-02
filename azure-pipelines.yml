@@ -9,13 +9,21 @@ variables:
   projectFolder: 'argon-react-native' 
 
 steps:
-  # 1. Instalar Node.js usando a tarefa moderna recomendada pela Microsoft
+  # 1. Configurar explicitamente a versão do Java (JDK 17) exigida pelo Gradle 7.5.1
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '17'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+    displayName: 'Configurar Java JDK 17 para Gradle'
+
+  # 2. Instalar Node.js
   - task: UseNode@1
     inputs:
       version: '$(node_version)'
     displayName: 'Instalar Node.js'
 
-  # 2.1 Instalar dependências (Com log ativo para evitar travamento por timeout)
+  # 3. Instalar dependências JavaScript
   - script: |
       export CI=true
       echo "=== Forçando instalação limpa e monitorada ==="
@@ -23,7 +31,7 @@ steps:
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
     displayName: 'Instalar dependências (npm install)'
 
-  # 2.2 Gerar pasta nativa /android isoladamente (Corrigido com jq e --no-install)
+  # 4. Gerar pasta nativa /android isoladamente
   - script: |
       export CI=true
       echo "=== Injetando a configuração do pacote Android no app.json ==="
@@ -34,19 +42,19 @@ steps:
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
     displayName: 'Pré-configurar Android (Expo Prebuild)'
     
-  # 3. Executar testes com npx
+  # 5. Executar testes com npx
   - script: npx jest --passWithNoTests
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)'
     displayName: 'Executar testes (npx)'
 
-  # 4. Compilar APK (Agora a pasta /android existirá graças ao prebuild)
+  # 6. Compilar APK (Agora garantido com o ambiente correto da JDK 17)
   - script: |
       chmod +x gradlew
       ./gradlew assembleRelease
     workingDirectory: '$(Build.SourcesDirectory)/$(projectFolder)/android'
     displayName: 'Compilar APK (Release)'
 
-  # 5. Publicar o arquivo APK gerado como artefato
+  # 7. Publicar o arquivo APK gerado como artefato
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: '$(Build.SourcesDirectory)/$(projectFolder)/android/app/build/outputs/apk/release/'
